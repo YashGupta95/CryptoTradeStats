@@ -16,6 +16,9 @@ namespace CryptoTradeStats
             try
             {
                 var usdtStatistics = GetStatistics(spreadsheet.Workbook.Worksheets["USDT"]);
+                var btcStatistics = GetStatistics(spreadsheet.Workbook.Worksheets["BTC"]);
+
+                //Add Enum for Altcoins Worksheets
             }
             finally
             {
@@ -23,7 +26,7 @@ namespace CryptoTradeStats
             }
         }
 
-        private static object GetStatistics(ExcelWorksheet tradeSheet)
+        private static TradeStatistics GetStatistics(ExcelWorksheet tradeSheet)
         {
             var start = tradeSheet.Dimension.Start;
             var end = tradeSheet.Dimension.End;
@@ -49,7 +52,12 @@ namespace CryptoTradeStats
                 totalSellAmount += Math.Round(actualSellAmount, 2, MidpointRounding.ToEven);
             }
 
-
+            return new TradeStatistics(
+                logbookEntries: (end.Row - 1), 
+                buyEntries: totalBuyEntries, 
+                buyAmount: totalBuyAmount, 
+                sellEntries: totalSellEntries, 
+                sellAmount: totalSellAmount);
         }
     }
 }
