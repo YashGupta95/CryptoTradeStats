@@ -1,8 +1,6 @@
 ﻿using OfficeOpenXml;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace CryptoTradeStats
 {
@@ -15,10 +13,10 @@ namespace CryptoTradeStats
 
             try
             {
-                var usdtStatistics = GetStatistics(spreadsheet.Workbook.Worksheets["USDT"]);
-                var btcStatistics = GetStatistics(spreadsheet.Workbook.Worksheets["BTC"]);
+                var usdtStatistics = GetStatistics(spreadsheet.Workbook.Worksheets[Stablecoins.USDT.ToString()]);
+                var btcStatistics = GetStatistics(spreadsheet.Workbook.Worksheets[Stablecoins.BTC.ToString()]);
 
-                //Add Enum for Altcoins Worksheets
+                //Add code to display statistics
             }
             finally
             {
