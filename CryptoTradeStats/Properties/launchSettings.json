@@ -2,7 +2,7 @@
   "profiles": {
     "CryptoTradeStats": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\Crypto Trading Logbook.xlsx"
+      "commandLineArgs": "\"D:\\Crypto Trading Logbook.xlsx\""
     }
   }
 }

@@ -10,6 +10,10 @@ namespace CryptoTradeStats
 
             var tradeManager = new TradeManager();
             tradeManager.GetTradeSummary(logbookDirectory);
+            //TODO: Add functionality to get per coin investment details
+
+            Console.WriteLine("Press any key to continue");
+            Console.ReadLine();
         }
     }
 }

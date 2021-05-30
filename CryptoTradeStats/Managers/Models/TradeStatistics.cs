@@ -4,17 +4,21 @@
     {
         public int LogbookEntries { get; set; }
         public int BuyEntries { get; set; }
-        public double BuyAmount { get; set; }
+        public double DepositBuyAmount {get; set;}
+        public double ReinvestedBuyAmount { get; set; }
+        public double TotalBuyAmount { get; set; }
         public int SellEntries { get; set; }
-        public double SellAmount { get; set; }
+        public double TotalSellAmount { get; set; }
 
-        public TradeStatistics(int logbookEntries, int buyEntries, double buyAmount, int sellEntries, double sellAmount)
+        public TradeStatistics(int logbookEntries, int buyEntries, double depositBuyAmount, double reinvestedBuyAmount, double totalBuyAmount, int sellEntries, double totalSellAmount)
         {
             LogbookEntries = logbookEntries;
             BuyEntries = buyEntries;
-            BuyAmount = buyAmount;
+            DepositBuyAmount = depositBuyAmount;
+            ReinvestedBuyAmount = reinvestedBuyAmount;
+            TotalBuyAmount = totalBuyAmount;
             SellEntries = sellEntries;
-            SellAmount = sellAmount;
+            TotalSellAmount = totalSellAmount;
         }
     }
 }
