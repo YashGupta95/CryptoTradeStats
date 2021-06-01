@@ -1,6 +1,6 @@
 ﻿namespace CryptoTradeStats
 {
-    internal sealed class TradeStatistics
+    internal sealed class TradeStatisticsSummary
     {
         public int LogbookEntries { get; set; }
         public int BuyEntries { get; set; }
@@ -10,7 +10,7 @@
         public int SellEntries { get; set; }
         public double TotalSellAmount { get; set; }
 
-        public TradeStatistics(int logbookEntries, int buyEntries, double depositBuyAmount, double reinvestedBuyAmount, double totalBuyAmount, int sellEntries, double totalSellAmount)
+        public TradeStatisticsSummary(int logbookEntries, int buyEntries, double depositBuyAmount, double reinvestedBuyAmount, double totalBuyAmount, int sellEntries, double totalSellAmount)
         {
             LogbookEntries = logbookEntries;
             BuyEntries = buyEntries;
