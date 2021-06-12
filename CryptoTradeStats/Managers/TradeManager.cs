@@ -1,29 +1,75 @@
 ﻿using OfficeOpenXml;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
 
 namespace CryptoTradeStats
 {
     internal class TradeManager
     {
-        public void GetTradingSummary(ExcelPackage spreadsheet)
+        private const string DepositTradeType = "Deposit (INR)";
+        private const string ReinvestTradeType = "Reinvest (USDT)";
+
+        public void FetchPortfolioSummary(ExcelPackage spreadsheet)
         {
             foreach (Stablecoin stablecoin in Enum.GetValues(typeof(Stablecoin)))
             {
-                var statistics = GetStatistics(spreadsheet.Workbook.Worksheets[stablecoin.ToString()]);
-                DisplayStatistics(statistics, stablecoin);
+                var statistics = GetPortfolioSummary(spreadsheet.Workbook.Worksheets[stablecoin.ToString()]);
+                DisplayPortfolioSummary(statistics, stablecoin);
             }
         }
 
-        public void GetCryptocurrencyTradeDetails(string cryptocurrencyName, ExcelPackage spreadsheet)
+        public void GetCryptocurrencyTradeDetails(string cryptocurrencyName, string tradingStablecoin, ExcelPackage spreadsheet) //Add Exception Handling
         {
-            //TODO: Start implementation
+            var excelWorksheet = spreadsheet.Workbook.Worksheets[tradingStablecoin];
+
+            var rowCount = excelWorksheet.Dimension.End.Row;
+            var dateTimeFormat = "dd-MM-yyyy HH:mm:ss";
+            
+            var buyRecordsData = new List<StatisticsBuy>();
+            var sellRecordsData = new List<StatisticsSell>();
+
+            for (int row = 1; row <= rowCount; row++)
+            {
+                if (excelWorksheet.Cells[row, 2].Value.ToString() == cryptocurrencyName)
+                {
+                    if (excelWorksheet.Cells[row, 12].Value.ToString() == DepositTradeType || excelWorksheet.Cells[row, 12].Value.ToString() == ReinvestTradeType)
+                    {
+                        var buyPriceInr = double.Parse(excelWorksheet.Cells[row, 7].Value.ToString());
+
+                        var buyRecords = new StatisticsBuy(
+                            dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
+                            coinPrice: double.Parse(excelWorksheet.Cells[row, 4].Value.ToString()),
+                            amount: double.Parse(excelWorksheet.Cells[row, 5].Value.ToString()),
+                            totalBuyPriceInr: Math.Round(buyPriceInr, 2)
+                            );
+
+                        buyRecordsData.Add(buyRecords);
+                    }
+                    else
+                    {
+                        var sellPriceInr = double.Parse(excelWorksheet.Cells[row, 11].Value.ToString());
+
+                        var sellRecords = new StatisticsSell(
+                            dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
+                            coinPrice: double.Parse(excelWorksheet.Cells[row, 8].Value.ToString()),
+                            amount: double.Parse(excelWorksheet.Cells[row, 9].Value.ToString()),
+                            totalSellPriceInr: Math.Round(sellPriceInr, 2)
+                            );
+
+                        sellRecordsData.Add(sellRecords);
+                    }
+                }
+            }
+
+            Console.WriteLine($"\nRecords found for {cryptocurrencyName}/{tradingStablecoin} :");
+            DisplayBuyRecords(buyRecordsData, sellRecordsData, tradingStablecoin);
         }
-
-        private static TradeStatisticsSummary GetStatistics(ExcelWorksheet tradeSheet)
+                
+        private static PortfolioSummary GetPortfolioSummary(ExcelWorksheet excelWorksheet)
         {
-            var start = tradeSheet.Dimension.Start;
-            var end = tradeSheet.Dimension.End;
-
             int totalBuyEntries = 0;
             int totalSellEntries = 0;
 
@@ -32,29 +78,32 @@ namespace CryptoTradeStats
             double totalBuyAmount = 0.0;
             double totalSellAmount = 0.0;
 
+            var start = excelWorksheet.Dimension.Start;
+            var end = excelWorksheet.Dimension.End;
+
             try
             {
                 for (int r = start.Row + 1; r <= end.Row; r++)
                 {
-                    totalBuyEntries = tradeSheet.Cells[r, 6].Value.ToString() != "0" ? (totalBuyEntries += 1) : (totalBuyEntries += 0);
-                    if (tradeSheet.Cells[r, 12].Value.ToString() == "Deposit (INR)")
+                    totalBuyEntries = excelWorksheet.Cells[r, 6].Value.ToString() != "0" ? (totalBuyEntries += 1) : (totalBuyEntries += 0);
+                    if (excelWorksheet.Cells[r, 12].Value.ToString() == DepositTradeType)
                     {
-                        var actualDepositBuyAmount = double.Parse(tradeSheet.Cells[r, 7].Value.ToString());
+                        var actualDepositBuyAmount = double.Parse(excelWorksheet.Cells[r, 7].Value.ToString());
                         depositBuyAmount += Math.Round(actualDepositBuyAmount, 2);
                     }
                     else
                     {
-                        var actualReinvestedBuyAmount = double.Parse(tradeSheet.Cells[r, 7].Value.ToString());
+                        var actualReinvestedBuyAmount = double.Parse(excelWorksheet.Cells[r, 7].Value.ToString());
                         reinvestedBuyAmount += Math.Round(actualReinvestedBuyAmount, 2);
                     }
                     totalBuyAmount = depositBuyAmount + reinvestedBuyAmount;
 
-                    totalSellEntries = tradeSheet.Cells[r, 10].Value.ToString() != "0" ? (totalSellEntries += 1) : (totalSellEntries += 0);
-                    var actualSellAmount = double.Parse(tradeSheet.Cells[r, 11].Value.ToString());
+                    totalSellEntries = excelWorksheet.Cells[r, 10].Value.ToString() != "0" ? (totalSellEntries += 1) : (totalSellEntries += 0);
+                    var actualSellAmount = double.Parse(excelWorksheet.Cells[r, 11].Value.ToString());
                     totalSellAmount += Math.Round(actualSellAmount, 2);
                 }
 
-                return new TradeStatisticsSummary(
+                return new PortfolioSummary(
                     logbookEntries: (end.Row - 1),
                     buyEntries: totalBuyEntries,
                     depositBuyAmount: depositBuyAmount,
@@ -67,20 +116,46 @@ namespace CryptoTradeStats
             catch (Exception e)
             {
                 throw new StatisticsEvaluationFailedException($"Exception occurred while determining Trade Statistics for the provided spreadsheet. Exception Type: {e.GetType().Name}, Actual Exception message: {e.Message}");
-            }            
+            }
         }
-        
-        private void DisplayStatistics(TradeStatisticsSummary tradeStatisticsSummary, Stablecoin stablecoinName)
+
+        private void DisplayPortfolioSummary(PortfolioSummary portfolioSummary, Stablecoin stablecoinName)
         {
             Console.WriteLine($"----- Trade Statistics for {stablecoinName} Trading ------ \n");
 
-            Console.WriteLine($"- Total number of entries found in Logbook for {stablecoinName} Trades: {tradeStatisticsSummary.LogbookEntries} \n");
-            Console.WriteLine($"- Total Buy entries: {tradeStatisticsSummary.BuyEntries}");
-            Console.WriteLine($"- Deposit (INR) Buy Amount: Rs. {tradeStatisticsSummary.DepositBuyAmount}");
-            Console.WriteLine($"- Reinvested Buy Amount: Rs. {tradeStatisticsSummary.ReinvestedBuyAmount}");
-            Console.WriteLine($"- Total Buy Amount (INR): Rs. {tradeStatisticsSummary.TotalBuyAmount} \n");
-            Console.WriteLine($"- Total Sell entries: {tradeStatisticsSummary.SellEntries}");
-            Console.WriteLine($"- Total Sell Amount (INR): Rs. {tradeStatisticsSummary.TotalSellAmount} \n");
+            Console.WriteLine($"- Total number of entries found in Logbook for {stablecoinName} Trades: {portfolioSummary.LogbookEntries} \n");
+            Console.WriteLine($"- Total Buy entries: {portfolioSummary.BuyEntries}");
+            Console.WriteLine($"- Deposit (INR) Buy Amount: Rs. {portfolioSummary.DepositBuyAmount}");
+            Console.WriteLine($"- Reinvested Buy Amount: Rs. {portfolioSummary.ReinvestedBuyAmount}");
+            Console.WriteLine($"- Total Buy Amount (INR): Rs. {portfolioSummary.TotalBuyAmount} \n");
+            Console.WriteLine($"- Total Sell entries: {portfolioSummary.SellEntries}");
+            Console.WriteLine($"- Total Sell Amount (INR): Rs. {portfolioSummary.TotalSellAmount} \n");
+        }
+
+        private void DisplayBuyRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, string stablecoin)
+        {
+            var format = "{0, -25} {1, -20} {2, -20} {3, -25} \n";
+
+            var buyRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Amount", "Total Buy Price (INR)");
+            var sellRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Amount", "Total Sell Price (INR)");
+
+            buyRecordsOutput.AppendLine();
+            foreach (var buyRecord in buyRecordsData)
+            {
+                buyRecordsOutput.AppendFormat(format, buyRecord.DateOfTransaction, $"{buyRecord.CoinPrice} {stablecoin}", buyRecord.Amount, buyRecord.TotalBuyPriceInr);
+            }
+
+            Console.WriteLine("\nBuy Records: \n");
+            Console.WriteLine(buyRecordsOutput.ToString());
+
+            sellRecordsOutput.AppendLine();
+            foreach (var sellRecord in sellRecordsData)
+            {
+                sellRecordsOutput.AppendFormat(format, sellRecord.DateOfTransaction, $"{sellRecord.CoinPrice} {stablecoin}", sellRecord.Amount, sellRecord.TotalSellPriceInr);
+            }
+
+            Console.WriteLine("\nSell Records: \n");
+            Console.WriteLine(sellRecordsOutput.ToString());
         }
     }
 }

@@ -16,7 +16,7 @@ namespace CryptoTradeStats
             var tradeManager = new TradeManager();
 
             Console.WriteLine("------ Cypto Trade Stats ----- \n");
-            Console.WriteLine("1. Trading Summary");
+            Console.WriteLine("1. Trading Portfolio Summary");
             Console.WriteLine("2. Trading Details for a specific Cryptocurrency");
 
             Console.WriteLine("\nEnter your choice: ");
@@ -25,13 +25,15 @@ namespace CryptoTradeStats
             switch (userInput)
             {
                 case "1":
-                    tradeManager.GetTradingSummary(spreadsheet);
+                    tradeManager.FetchPortfolioSummary(spreadsheet);
                     break;
 
                 case "2":
                     Console.WriteLine("\nEnter the name of Cryptocurrency (e.g. ETH for Ethereum): ");
                     var cryptocurrencyName = Console.ReadLine();
-                    tradeManager.GetCryptocurrencyTradeDetails(cryptocurrencyName, spreadsheet); //Start implementation
+                    Console.WriteLine("\nEnter the name of Trading Stablecoin (e.g. USDT for Tether): ");
+                    var tradingStablecoin = Console.ReadLine();
+                    tradeManager.GetCryptocurrencyTradeDetails(cryptocurrencyName, tradingStablecoin, spreadsheet);
                     break;
 
                 default:
