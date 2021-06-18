@@ -13,7 +13,7 @@ namespace CryptoTradeStats
             var logbookDirectory = args[0];
             using var spreadsheet = new ExcelPackage(new FileInfo(logbookDirectory));
 
-            var tradeManager = new TradeManager();
+            var portfolioManager = new PortfolioManager();
 
             Console.WriteLine("------ Cypto Trade Stats ----- \n");
             Console.WriteLine("1. Trading Portfolio Summary");
@@ -25,7 +25,7 @@ namespace CryptoTradeStats
             switch (userInput)
             {
                 case "1":
-                    tradeManager.FetchPortfolioSummary(spreadsheet);
+                    portfolioManager.FetchPortfolioSummary(spreadsheet);
                     break;
 
                 case "2":
@@ -33,7 +33,7 @@ namespace CryptoTradeStats
                     var cryptocurrencyName = Console.ReadLine();
                     Console.WriteLine("\nEnter the name of Trading Stablecoin (e.g. USDT for Tether): ");
                     var tradingStablecoin = Console.ReadLine();
-                    tradeManager.GetCryptocurrencyTradeDetails(cryptocurrencyName, tradingStablecoin, spreadsheet);
+                    portfolioManager.GetCryptocurrencyTradeDetails(cryptocurrencyName, tradingStablecoin, spreadsheet);
                     break;
 
                 default:

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CryptoTradeStats
 {
-    internal class TradeManager
+    internal class PortfolioManager
     {
         private const string DepositTradeType = "Deposit (INR)";
         private const string ReinvestTradeType = "Reinvest (USDT)";
@@ -81,6 +81,12 @@ namespace CryptoTradeStats
             var start = excelWorksheet.Dimension.Start;
             var end = excelWorksheet.Dimension.End;
 
+            var coinsList = excelWorksheet.Cells
+                .Where(c => (c.Address.Contains("B")) && (c.Value.ToString() != "Coin"))
+                .Select(c => c.Value.ToString())
+                .Distinct()
+                .ToList();
+
             try
             {
                 for (int r = start.Row + 1; r <= end.Row; r++)
@@ -110,7 +116,8 @@ namespace CryptoTradeStats
                     reinvestedBuyAmount: reinvestedBuyAmount,
                     totalBuyAmount: totalBuyAmount,
                     sellEntries: totalSellEntries,
-                    totalSellAmount: totalSellAmount
+                    totalSellAmount: totalSellAmount,
+                    coinsList: coinsList
                 );
             }
             catch (Exception e)
@@ -121,13 +128,20 @@ namespace CryptoTradeStats
 
         private void DisplayPortfolioSummary(PortfolioSummary portfolioSummary, Stablecoin stablecoinName)
         {
-            Console.WriteLine($"----- Trade Statistics for {stablecoinName} Trading ------ \n");
+            Console.WriteLine($"--------- Trade Statistics for {stablecoinName} Trading ---------- \n");
 
             Console.WriteLine($"- Total number of entries found in Logbook for {stablecoinName} Trades: {portfolioSummary.LogbookEntries} \n");
-            Console.WriteLine($"- Total Buy entries: {portfolioSummary.BuyEntries}");
+            Console.WriteLine("Coins in Portfolio:\n");
+            foreach (var coin in portfolioSummary.CoinsList)
+            {
+                Console.WriteLine($"{coin}");
+            }
+
+            Console.WriteLine($"\n- Total Buy entries: {portfolioSummary.BuyEntries}");
             Console.WriteLine($"- Deposit (INR) Buy Amount: Rs. {portfolioSummary.DepositBuyAmount}");
             Console.WriteLine($"- Reinvested Buy Amount: Rs. {portfolioSummary.ReinvestedBuyAmount}");
             Console.WriteLine($"- Total Buy Amount (INR): Rs. {portfolioSummary.TotalBuyAmount} \n");
+
             Console.WriteLine($"- Total Sell entries: {portfolioSummary.SellEntries}");
             Console.WriteLine($"- Total Sell Amount (INR): Rs. {portfolioSummary.TotalSellAmount} \n");
         }
