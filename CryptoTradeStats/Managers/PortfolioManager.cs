@@ -9,8 +9,8 @@ namespace CryptoTradeStats
 {
     internal class PortfolioManager
     {
-        private const string DepositTradeType = "Deposit (INR)";
-        private const string ReinvestTradeType = "Reinvest (USDT)";
+        private const string DepositTradeType = "Buy";
+        private const string ReinvestTradeType = "Reinvest";
 
         public void FetchPortfolioSummary(ExcelPackage spreadsheet)
         {
@@ -21,7 +21,7 @@ namespace CryptoTradeStats
             }
         }
 
-        public void GetCryptocurrencyTradeDetails(string cryptocurrencyName, string tradingStablecoin, ExcelPackage spreadsheet) //Add Exception Handling
+        public void GetCryptocurrencyTradeDetails(string cryptocurrencyName, string tradingStablecoin, ExcelPackage spreadsheet) //TODO: Add Exception Handling
         {
             var excelWorksheet = spreadsheet.Workbook.Worksheets[tradingStablecoin];
 
@@ -65,7 +65,7 @@ namespace CryptoTradeStats
             }
 
             Console.WriteLine($"\nRecords found for {cryptocurrencyName}/{tradingStablecoin} :");
-            DisplayBuyRecords(buyRecordsData, sellRecordsData, tradingStablecoin);
+            DisplayTradeRecords(buyRecordsData, sellRecordsData, tradingStablecoin);
         }
                 
         private static PortfolioSummary GetPortfolioSummary(ExcelWorksheet excelWorksheet)
@@ -128,7 +128,7 @@ namespace CryptoTradeStats
 
         private void DisplayPortfolioSummary(PortfolioSummary portfolioSummary, Stablecoin stablecoinName)
         {
-            Console.WriteLine($"--------- Trade Statistics for {stablecoinName} Trading ---------- \n");
+            Console.WriteLine($"\n--------- Trade Statistics for {stablecoinName} Trading ---------- \n");
 
             Console.WriteLine($"- Total number of entries found in Logbook for {stablecoinName} Trades: {portfolioSummary.LogbookEntries} \n");
             Console.WriteLine("Coins in Portfolio:\n");
@@ -146,8 +146,9 @@ namespace CryptoTradeStats
             Console.WriteLine($"- Total Sell Amount (INR): Rs. {portfolioSummary.TotalSellAmount} \n");
         }
 
-        private void DisplayBuyRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, string stablecoin)
+        private void DisplayTradeRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, string stablecoin) 
         {
+            //TODO: Add functionality to show current amount being invested in there
             var format = "{0, -25} {1, -20} {2, -20} {3, -25} \n";
 
             var buyRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Amount", "Total Buy Price (INR)");
