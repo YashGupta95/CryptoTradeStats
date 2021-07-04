@@ -27,47 +27,54 @@ namespace CryptoTradeStats
 
             var rowCount = excelWorksheet.Dimension.End.Row;
             var dateTimeFormat = "dd-MM-yyyy HH:mm:ss";
-            
+
             var buyRecordsData = new List<StatisticsBuy>();
             var sellRecordsData = new List<StatisticsSell>();
 
-            for (int row = 1; row <= rowCount; row++)
+            try
             {
-                if (excelWorksheet.Cells[row, 2].Value.ToString() == cryptocurrencyName)
+                for (int row = 1; row <= rowCount; row++)
                 {
-                    if (excelWorksheet.Cells[row, 12].Value.ToString() == DepositTradeType || excelWorksheet.Cells[row, 12].Value.ToString() == ReinvestTradeType)
+                    if (excelWorksheet.Cells[row, 2].Value.ToString() == cryptocurrencyName)
                     {
-                        var buyPriceInr = double.Parse(excelWorksheet.Cells[row, 7].Value.ToString());
+                        if (excelWorksheet.Cells[row, 12].Value.ToString() == DepositTradeType || excelWorksheet.Cells[row, 12].Value.ToString() == ReinvestTradeType)
+                        {
+                            var buyPriceInr = double.Parse(excelWorksheet.Cells[row, 7].Value.ToString());
 
-                        var buyRecords = new StatisticsBuy(
-                            dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
-                            coinPrice: double.Parse(excelWorksheet.Cells[row, 4].Value.ToString()),
-                            amount: double.Parse(excelWorksheet.Cells[row, 5].Value.ToString()),
-                            totalBuyPriceInr: Math.Round(buyPriceInr, 2)
-                            );
+                            var buyRecords = new StatisticsBuy(
+                                dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
+                                coinPrice: double.Parse(excelWorksheet.Cells[row, 4].Value.ToString()),
+                                amount: double.Parse(excelWorksheet.Cells[row, 5].Value.ToString()),
+                                totalBuyPriceInr: Math.Round(buyPriceInr, 2)
+                                );
 
-                        buyRecordsData.Add(buyRecords);
-                    }
-                    else
-                    {
-                        var sellPriceInr = double.Parse(excelWorksheet.Cells[row, 11].Value.ToString());
+                            buyRecordsData.Add(buyRecords);
+                        }
+                        else
+                        {
+                            var sellPriceInr = double.Parse(excelWorksheet.Cells[row, 11].Value.ToString());
 
-                        var sellRecords = new StatisticsSell(
-                            dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
-                            coinPrice: double.Parse(excelWorksheet.Cells[row, 8].Value.ToString()),
-                            amount: double.Parse(excelWorksheet.Cells[row, 9].Value.ToString()),
-                            totalSellPriceInr: Math.Round(sellPriceInr, 2)
-                            );
+                            var sellRecords = new StatisticsSell(
+                                dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
+                                coinPrice: double.Parse(excelWorksheet.Cells[row, 8].Value.ToString()),
+                                amount: double.Parse(excelWorksheet.Cells[row, 9].Value.ToString()),
+                                totalSellPriceInr: Math.Round(sellPriceInr, 2)
+                                );
 
-                        sellRecordsData.Add(sellRecords);
+                            sellRecordsData.Add(sellRecords);
+                        }
                     }
                 }
-            }
 
-            Console.WriteLine($"\nRecords found for {cryptocurrencyName}/{tradingStablecoin} :");
-            DisplayTradeRecords(buyRecordsData, sellRecordsData, tradingStablecoin);
+                Console.WriteLine($"\nRecords found for {cryptocurrencyName}/{tradingStablecoin} :");
+                DisplayTradeRecords(buyRecordsData, sellRecordsData, tradingStablecoin);
+            }
+            catch (Exception e)
+            {
+                throw new StatisticsParsingFailedException($"Exception occurred while fetching and parsing trading information for {cryptocurrencyName}/{tradingStablecoin}. Exception Type: {e.GetType().Name}, Actual Exception message: {e.Message}");
+            }
         }
-                
+
         private static PortfolioSummary GetPortfolioSummary(ExcelWorksheet excelWorksheet)
         {
             int totalBuyEntries = 0;
@@ -122,7 +129,7 @@ namespace CryptoTradeStats
             }
             catch (Exception e)
             {
-                throw new StatisticsEvaluationFailedException($"Exception occurred while determining Trade Statistics for the provided spreadsheet. Exception Type: {e.GetType().Name}, Actual Exception message: {e.Message}");
+                throw new PortfolioEvaluationFailedException($"Exception occurred while fetching Portfolio Summary for the spreadsheet specified. Exception Type: {e.GetType().Name}, Actual Exception message: {e.Message}");
             }
         }
 
@@ -146,7 +153,7 @@ namespace CryptoTradeStats
             Console.WriteLine($"- Total Sell Amount (INR): Rs. {portfolioSummary.TotalSellAmount} \n");
         }
 
-        private void DisplayTradeRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, string stablecoin) 
+        private void DisplayTradeRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, string stablecoin)
         {
             //TODO: Add functionality to show current amount being invested in there
             var format = "{0, -25} {1, -20} {2, -20} {3, -25} \n";
