@@ -12,6 +12,9 @@ namespace CryptoTradeStats
         private const string DepositTradeType = "Buy";
         private const string ReinvestTradeType = "Reinvest";
 
+        private CurrentInvestmentData currentInvestmentData;
+
+
         public void FetchPortfolioSummary(ExcelPackage spreadsheet)
         {
             foreach (Stablecoin stablecoin in Enum.GetValues(typeof(Stablecoin)))
@@ -21,7 +24,7 @@ namespace CryptoTradeStats
             }
         }
 
-        public void GetCryptocurrencyTradeDetails(string cryptocurrencyName, string tradingStablecoin, ExcelPackage spreadsheet) //TODO: Add Exception Handling
+        public void GetCryptocurrencyTradeDetails(string cryptocurrencyName, string tradingStablecoin, ExcelPackage spreadsheet)
         {
             var excelWorksheet = spreadsheet.Workbook.Worksheets[tradingStablecoin];
 
@@ -66,8 +69,26 @@ namespace CryptoTradeStats
                     }
                 }
 
+                var totalBuyVolume = buyRecordsData.Sum(r => r.Amount);
+                var totalSellVolume = sellRecordsData.Sum(r => r.Amount);
+
+                if (totalBuyVolume == totalSellVolume)
+                {
+                    currentInvestmentData = new CurrentInvestmentData(cryptocurrencyName, volume: 0, netInvestedAmount: 0.0);
+                }
+                else if (totalBuyVolume > totalSellVolume)
+                {
+                    var netBuyAmount = buyRecordsData.Sum(r => r.TotalBuyPriceInr);
+                    var netSellAmount = sellRecordsData.Sum(r => r.TotalSellPriceInr);
+
+                    currentInvestmentData = new CurrentInvestmentData(
+                        cryptocurrencyName,
+                        volume: (totalBuyVolume - totalSellVolume), 
+                        netInvestedAmount: Math.Round((netBuyAmount - netSellAmount), 2));
+                }
+
                 Console.WriteLine($"\nRecords found for {cryptocurrencyName}/{tradingStablecoin} :");
-                DisplayTradeRecords(buyRecordsData, sellRecordsData, tradingStablecoin);
+                DisplayTradeRecords(buyRecordsData, sellRecordsData, currentInvestmentData, tradingStablecoin);
             }
             catch (Exception e)
             {
@@ -153,9 +174,8 @@ namespace CryptoTradeStats
             Console.WriteLine($"- Total Sell Amount (INR): Rs. {portfolioSummary.TotalSellAmount} \n");
         }
 
-        private void DisplayTradeRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, string stablecoin)
+        private void DisplayTradeRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, CurrentInvestmentData currentInvestmentData, string stablecoin)
         {
-            //TODO: Add functionality to show current amount being invested in there
             var format = "{0, -25} {1, -20} {2, -20} {3, -25} \n";
 
             var buyRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Amount", "Total Buy Price (INR)");
@@ -178,6 +198,8 @@ namespace CryptoTradeStats
 
             Console.WriteLine("\nSell Records: \n");
             Console.WriteLine(sellRecordsOutput.ToString());
+
+            Console.WriteLine($"\n\nVolume of {currentInvestmentData.CryptocurrencyName} in Portfolio: {currentInvestmentData.Volume}  \nCurrent Invested Amount: {currentInvestmentData.NetInvestedAmount}\n");
         }
     }
 }
