@@ -17,6 +17,7 @@ You can run the application using Visual Studio or VS Code. There's a sample Por
 
 * Website: https://www.linkedin.com/in/yashgupta96/
 * Github: [@YashGupta95](https://github.com/YashGupta95)
+* StackOverflow: [@yash-gupta](https://stackoverflow.com/users/5498542/yash-gupta?tab=profile)
 * LinkedIn: [@yashgupta96](https://linkedin.com/in/yashgupta96)
 
 ## Show your support
