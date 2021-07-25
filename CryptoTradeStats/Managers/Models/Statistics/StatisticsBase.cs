@@ -6,13 +6,13 @@ namespace CryptoTradeStats
     {
         public DateTime DateOfTransaction { get; set; }
         public double CoinPrice { get; }
-        public double Amount { get; }
+        public double Volume { get; }
         
-        protected StatisticsBase(DateTime dateOfTransaction, double coinPrice, double amount)
+        protected StatisticsBase(DateTime dateOfTransaction, double coinPrice, double volume)
         {
             DateOfTransaction = dateOfTransaction;
             CoinPrice = coinPrice;
-            Amount = amount;
+            Volume = volume;
         }
     }
 }

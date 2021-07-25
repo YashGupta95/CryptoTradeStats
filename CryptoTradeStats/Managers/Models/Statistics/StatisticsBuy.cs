@@ -6,7 +6,7 @@ namespace CryptoTradeStats
     {
         public double TotalBuyPriceInr { get; }
 
-        public StatisticsBuy(DateTime dateOfTransaction, double coinPrice, double amount, double totalBuyPriceInr) : base(dateOfTransaction, coinPrice, amount)
+        public StatisticsBuy(DateTime dateOfTransaction, double coinPrice, double volume, double totalBuyPriceInr) : base(dateOfTransaction, coinPrice, volume)
         {
             TotalBuyPriceInr = totalBuyPriceInr;
         }

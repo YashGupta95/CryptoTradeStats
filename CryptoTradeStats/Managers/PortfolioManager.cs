@@ -14,7 +14,6 @@ namespace CryptoTradeStats
 
         private CurrentInvestmentData currentInvestmentData;
 
-
         public void FetchPortfolioSummary(ExcelPackage spreadsheet)
         {
             foreach (Stablecoin stablecoin in Enum.GetValues(typeof(Stablecoin)))
@@ -47,7 +46,7 @@ namespace CryptoTradeStats
                             var buyRecords = new StatisticsBuy(
                                 dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
                                 coinPrice: double.Parse(excelWorksheet.Cells[row, 4].Value.ToString()),
-                                amount: double.Parse(excelWorksheet.Cells[row, 5].Value.ToString()),
+                                volume: double.Parse(excelWorksheet.Cells[row, 5].Value.ToString()),
                                 totalBuyPriceInr: Math.Round(buyPriceInr, 2)
                                 );
 
@@ -60,7 +59,7 @@ namespace CryptoTradeStats
                             var sellRecords = new StatisticsSell(
                                 dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
                                 coinPrice: double.Parse(excelWorksheet.Cells[row, 8].Value.ToString()),
-                                amount: double.Parse(excelWorksheet.Cells[row, 9].Value.ToString()),
+                                volume: double.Parse(excelWorksheet.Cells[row, 9].Value.ToString()),
                                 totalSellPriceInr: Math.Round(sellPriceInr, 2)
                                 );
 
@@ -69,8 +68,8 @@ namespace CryptoTradeStats
                     }
                 }
 
-                var totalBuyVolume = buyRecordsData.Sum(r => r.Amount);
-                var totalSellVolume = sellRecordsData.Sum(r => r.Amount);
+                var totalBuyVolume = buyRecordsData.Sum(r => r.Volume);
+                var totalSellVolume = sellRecordsData.Sum(r => r.Volume);
 
                 if (totalBuyVolume == totalSellVolume)
                 {
@@ -83,11 +82,11 @@ namespace CryptoTradeStats
 
                     currentInvestmentData = new CurrentInvestmentData(
                         cryptocurrencyName,
-                        volume: (totalBuyVolume - totalSellVolume), 
+                        volume: Math.Round((totalBuyVolume - totalSellVolume), 5), 
                         netInvestedAmount: Math.Round((netBuyAmount - netSellAmount), 2));
                 }
 
-                Console.WriteLine($"\nRecords found for {cryptocurrencyName}/{tradingStablecoin} :");
+                Console.WriteLine($"\nRecords found for \"{cryptocurrencyName}/{tradingStablecoin}\" in Portfolio :\n");
                 DisplayTradeRecords(buyRecordsData, sellRecordsData, currentInvestmentData, tradingStablecoin);
             }
             catch (Exception e)
@@ -176,30 +175,36 @@ namespace CryptoTradeStats
 
         private void DisplayTradeRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, CurrentInvestmentData currentInvestmentData, string stablecoin)
         {
-            var format = "{0, -25} {1, -20} {2, -20} {3, -25} \n";
+            var format = "{0, -25} | {1, -20} | {2, -20} | {3, -25} \n";
 
-            var buyRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Amount", "Total Buy Price (INR)");
-            var sellRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Amount", "Total Sell Price (INR)");
+            var buyRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Volume", "Total Buy Price (INR)");
+            var sellRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Volume", "Total Sell Price (INR)");
 
             buyRecordsOutput.AppendLine();
             foreach (var buyRecord in buyRecordsData)
             {
-                buyRecordsOutput.AppendFormat(format, buyRecord.DateOfTransaction, $"{buyRecord.CoinPrice} {stablecoin}", buyRecord.Amount, buyRecord.TotalBuyPriceInr);
+                buyRecordsOutput.AppendFormat(format, buyRecord.DateOfTransaction, $"{buyRecord.CoinPrice} {stablecoin}", buyRecord.Volume, buyRecord.TotalBuyPriceInr);
             }
 
-            Console.WriteLine("\nBuy Records: \n");
+            Console.WriteLine("**********************************************************************************************");
+            Console.WriteLine("Buy Records:");
+            Console.WriteLine("**********************************************************************************************");
             Console.WriteLine(buyRecordsOutput.ToString());
 
             sellRecordsOutput.AppendLine();
             foreach (var sellRecord in sellRecordsData)
             {
-                sellRecordsOutput.AppendFormat(format, sellRecord.DateOfTransaction, $"{sellRecord.CoinPrice} {stablecoin}", sellRecord.Amount, sellRecord.TotalSellPriceInr);
+                sellRecordsOutput.AppendFormat(format, sellRecord.DateOfTransaction, $"{sellRecord.CoinPrice} {stablecoin}", sellRecord.Volume, sellRecord.TotalSellPriceInr);
             }
 
-            Console.WriteLine("\nSell Records: \n");
+            Console.WriteLine("**********************************************************************************************");
+            Console.WriteLine("Sell Records:");
+            Console.WriteLine("**********************************************************************************************");
             Console.WriteLine(sellRecordsOutput.ToString());
 
-            Console.WriteLine($"\n\nVolume of {currentInvestmentData.CryptocurrencyName} in Portfolio: {currentInvestmentData.Volume}  \nCurrent Invested Amount: {currentInvestmentData.NetInvestedAmount}\n");
+            Console.WriteLine("**********************************************************************************************");
+            Console.WriteLine($"Volume of {currentInvestmentData.CryptocurrencyName} coins in Portfolio: {currentInvestmentData.Volume}  \nCurrent Invested Amount (INR): {currentInvestmentData.NetInvestedAmount}\n");
+            Console.WriteLine("**********************************************************************************************");
         }
     }
 }
