@@ -15,11 +15,13 @@ namespace CryptoTradeStats
 
             var portfolioManager = new PortfolioManager();
 
-            Console.WriteLine("------ Cypto Trade Stats ----- \n");
+            Console.WriteLine("**********************************************************************************************");
+            Console.WriteLine("-$-$-$-$-$-$-[ Welcome to Crypto Trade Stats ]-$-$-$-$-$-$- \n");
             Console.WriteLine("1. Trading Portfolio Summary");
-            Console.WriteLine("2. Trading Details for a specific Cryptocurrency");
+            Console.WriteLine("2. Trading Details for a specific Cryptocurrency\n");
+            Console.WriteLine("**********************************************************************************************");
 
-            Console.WriteLine("\nEnter your choice: ");
+            Console.WriteLine("Please select your option:");
             var userInput = Console.ReadLine();
 
             switch (userInput)

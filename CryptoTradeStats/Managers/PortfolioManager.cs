@@ -25,9 +25,10 @@ namespace CryptoTradeStats
 
         public void GetCryptocurrencyTradeDetails(string cryptocurrencyName, string tradingStablecoin, ExcelPackage spreadsheet)
         {
+            ValidateInputValues(cryptocurrencyName, tradingStablecoin);
+
             var excelWorksheet = spreadsheet.Workbook.Worksheets[tradingStablecoin];
 
-            var rowCount = excelWorksheet.Dimension.End.Row;
             var dateTimeFormat = "dd-MM-yyyy HH:mm:ss";
 
             var buyRecordsData = new List<StatisticsBuy>();
@@ -35,6 +36,8 @@ namespace CryptoTradeStats
 
             try
             {
+                var rowCount = excelWorksheet.Dimension.End.Row;
+
                 for (int row = 1; row <= rowCount; row++)
                 {
                     if (excelWorksheet.Cells[row, 2].Value.ToString() == cryptocurrencyName)
@@ -82,7 +85,7 @@ namespace CryptoTradeStats
 
                     currentInvestmentData = new CurrentInvestmentData(
                         cryptocurrencyName,
-                        volume: Math.Round((totalBuyVolume - totalSellVolume), 5), 
+                        volume: Math.Round((totalBuyVolume - totalSellVolume), 5),
                         netInvestedAmount: Math.Round((netBuyAmount - netSellAmount), 2));
                 }
 
@@ -171,6 +174,17 @@ namespace CryptoTradeStats
 
             Console.WriteLine($"- Total Sell entries: {portfolioSummary.SellEntries}");
             Console.WriteLine($"- Total Sell Amount (INR): Rs. {portfolioSummary.TotalSellAmount} \n");
+        }
+
+        private static void ValidateInputValues(string cryptocurrencyName, string tradingStablecoin)
+        {
+            var errorMessages = new StringBuilder();
+
+            errorMessages.AppendLineIfNotNull(ValidatorString.Validate("Cryptocurrency Name", cryptocurrencyName));
+            errorMessages.AppendLineIfNotNull(ValidatorString.Validate("Trading Stablecoin", tradingStablecoin));
+
+            if (errorMessages.Length != 0)
+                throw new InputValidationFailedException(errorMessages.ToString());
         }
 
         private void DisplayTradeRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, CurrentInvestmentData currentInvestmentData, string stablecoin)
