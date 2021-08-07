@@ -16,6 +16,8 @@ namespace CryptoTradeStats
 
         public void FetchPortfolioSummary(ExcelPackage spreadsheet)
         {
+            Console.WriteLine("**********************************************************************************************");
+
             foreach (Stablecoin stablecoin in Enum.GetValues(typeof(Stablecoin)))
             {
                 var statistics = GetPortfolioSummary(spreadsheet.Workbook.Worksheets[stablecoin.ToString()]);
@@ -28,7 +30,8 @@ namespace CryptoTradeStats
             ValidateInputValues(cryptocurrencyName, tradingStablecoin);
 
             var excelWorksheet = spreadsheet.Workbook.Worksheets[tradingStablecoin];
-
+            EnsureCryptocurrencyIsPresentInPortfolio(excelWorksheet, cryptocurrencyName);
+            
             var dateTimeFormat = "dd-MM-yyyy HH:mm:ss";
 
             var buyRecordsData = new List<StatisticsBuy>();
@@ -111,11 +114,7 @@ namespace CryptoTradeStats
             var start = excelWorksheet.Dimension.Start;
             var end = excelWorksheet.Dimension.End;
 
-            var coinsList = excelWorksheet.Cells
-                .Where(c => (c.Address.Contains("B")) && (c.Value.ToString() != "Coin"))
-                .Select(c => c.Value.ToString())
-                .Distinct()
-                .ToList();
+            var coinsList = GetAllCryptocurrencies(excelWorksheet);
 
             try
             {
@@ -158,33 +157,56 @@ namespace CryptoTradeStats
 
         private void DisplayPortfolioSummary(PortfolioSummary portfolioSummary, Stablecoin stablecoinName)
         {
-            Console.WriteLine($"\n--------- Trade Statistics for {stablecoinName} Trading ---------- \n");
+            Console.WriteLine($"TRADE STATISTICS FOR {stablecoinName} TRADING :");
+            Console.WriteLine("##############################################################################################");
 
-            Console.WriteLine($"- Total number of entries found in Logbook for {stablecoinName} Trades: {portfolioSummary.LogbookEntries} \n");
-            Console.WriteLine("Coins in Portfolio:\n");
+            Console.WriteLine($"\n{stablecoinName}-based Cryptocurrencies present in Portfolio:\n");
             foreach (var coin in portfolioSummary.CoinsList)
             {
-                Console.WriteLine($"{coin}");
+                Console.WriteLine($"{coin}/{stablecoinName}");
             }
 
+            Console.WriteLine($"\n- Total number of buy/sell entries found in Logbook for {stablecoinName} Trades: {portfolioSummary.LogbookEntries} \n");
+            Console.WriteLine("##############################################################################################");
             Console.WriteLine($"\n- Total Buy entries: {portfolioSummary.BuyEntries}");
             Console.WriteLine($"- Deposit (INR) Buy Amount: Rs. {portfolioSummary.DepositBuyAmount}");
             Console.WriteLine($"- Reinvested Buy Amount: Rs. {portfolioSummary.ReinvestedBuyAmount}");
             Console.WriteLine($"- Total Buy Amount (INR): Rs. {portfolioSummary.TotalBuyAmount} \n");
 
-            Console.WriteLine($"- Total Sell entries: {portfolioSummary.SellEntries}");
+            Console.WriteLine("##############################################################################################");
+            Console.WriteLine($"\n- Total Sell entries: {portfolioSummary.SellEntries}");
             Console.WriteLine($"- Total Sell Amount (INR): Rs. {portfolioSummary.TotalSellAmount} \n");
+            Console.WriteLine("##############################################################################################");
         }
 
         private static void ValidateInputValues(string cryptocurrencyName, string tradingStablecoin)
         {
             var errorMessages = new StringBuilder();
 
-            errorMessages.AppendLineIfNotNull(ValidatorString.Validate("Cryptocurrency Name", cryptocurrencyName));
+            errorMessages.AppendLineIfNotNull(ValidatorString.Validate("Cryptocurrency Symbol", cryptocurrencyName));
             errorMessages.AppendLineIfNotNull(ValidatorString.Validate("Trading Stablecoin", tradingStablecoin));
 
             if (errorMessages.Length != 0)
                 throw new InputValidationFailedException(errorMessages.ToString());
+        }
+
+        private static void EnsureCryptocurrencyIsPresentInPortfolio(ExcelWorksheet excelWorksheet, string cryptocurrencyName)
+        {
+            var coinsList = GetAllCryptocurrencies(excelWorksheet);
+
+            if (!coinsList.Contains(cryptocurrencyName))
+            {
+                throw new CryptocurrencyNotFoundException($"The Cryptocurrency \"{cryptocurrencyName}/{excelWorksheet.Name}\" is currently not present in your Portfolio. No records found.");
+            }
+        }
+
+        private static List<string> GetAllCryptocurrencies(ExcelWorksheet excelWorksheet)
+        {
+            return excelWorksheet.Cells
+                .Where(c => (c.Address.Contains("B")) && (c.Value.ToString() != "Coin"))
+                .Select(c => c.Value.ToString())
+                .Distinct()
+                .ToList();
         }
 
         private void DisplayTradeRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, CurrentInvestmentData currentInvestmentData, string stablecoin)

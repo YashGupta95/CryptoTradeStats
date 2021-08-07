@@ -6,7 +6,7 @@ namespace CryptoTradeStats
 {
     [Serializable]
     [ExcludeFromCodeCoverage]
-    public sealed class StatisticsParsingFailedException : Exception
+    internal sealed class StatisticsParsingFailedException : Exception
     {
         public string Reason => "Unable to parse Buy/Sell Statistics details.";
         public StatisticsParsingFailedException() { }

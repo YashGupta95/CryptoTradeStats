@@ -6,7 +6,7 @@ namespace CryptoTradeStats
 {
     [Serializable]
     [ExcludeFromCodeCoverage]
-    public sealed class PortfolioEvaluationFailedException : Exception
+    internal sealed class PortfolioEvaluationFailedException : Exception
     {
         public string Reason => "Failed to evaluate Portfolio statistics.";
         public PortfolioEvaluationFailedException() { }
