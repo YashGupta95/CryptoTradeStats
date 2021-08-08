@@ -14,8 +14,8 @@ namespace CryptoTradeStats
             using var spreadsheet = new ExcelPackage(new FileInfo(logbookDirectory));
 
             var portfolioManager = new PortfolioManager();
-            Console.WriteLine("******************************* Welcome to Crypto Trade Stats ********************************");
             string userInput;
+            Console.WriteLine("******************************* Welcome to Crypto Trade Stats ********************************");
 
             do
             {

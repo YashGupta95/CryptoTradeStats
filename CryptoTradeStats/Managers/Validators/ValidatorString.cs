@@ -1,6 +1,6 @@
 ﻿namespace CryptoTradeStats
 {
-    internal enum StringState { Null, Empty, WhiteSpaces, Valid }
+    internal enum StringState { Null, Empty, WhiteSpaces, Lowercase, Valid }
 
     internal static class ValidatorString
     {
@@ -10,6 +10,7 @@
             {
                 StringState.Null => $"The property: \"{propertyName}\" must be a valid {propertyName} and can not be null",
                 StringState.Empty => $"The property: \"{propertyName}\" must be a valid {propertyName} and can not be Empty",
+                StringState.Lowercase => $"The property: \"{propertyName}\" must be in Uppercase and not in Lowercase",
                 StringState.WhiteSpaces => $"The property: \"{propertyName}\" must be a valid {propertyName} and can not be Whitespaces",
                 _ => null,
             };
@@ -24,6 +25,14 @@
             else if (data.Length == 0)
             {
                 return StringState.Empty;
+            }
+
+            foreach (var chr in data)
+            {
+                if (char.IsLower(chr))
+                {
+                    return StringState.Lowercase;
+                }
             }
 
             foreach (var chr in data)
