@@ -4,7 +4,7 @@ namespace CryptoTradeStats
 {
     public abstract class StatisticsBase
     {
-        public DateTime DateOfTransaction { get; set; }
+        public DateTime DateOfTransaction { get; }
         public double CoinPrice { get; }
         public double Volume { get; }
         

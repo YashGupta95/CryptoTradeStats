@@ -2,9 +2,9 @@
 {
     internal sealed class CurrentInvestmentData
     {
-        public string CryptocurrencyName { get; set; }
-        public double Volume { get; set; }
-        public double NetInvestedAmount { get; set; }
+        public string CryptocurrencyName { get; }
+        public double Volume { get; }
+        public double NetInvestedAmount { get; }
 
         public CurrentInvestmentData(string cryptocurrencyName, double volume, double netInvestedAmount)
         {
