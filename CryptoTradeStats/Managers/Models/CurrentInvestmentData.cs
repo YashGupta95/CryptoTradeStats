@@ -3,10 +3,10 @@
     internal sealed class CurrentInvestmentData
     {
         public string CryptocurrencyName { get; }
-        public double Volume { get; }
-        public double NetInvestedAmount { get; }
+        public decimal Volume { get; }
+        public decimal NetInvestedAmount { get; }
 
-        public CurrentInvestmentData(string cryptocurrencyName, double volume, double netInvestedAmount)
+        public CurrentInvestmentData(string cryptocurrencyName, decimal volume, decimal netInvestedAmount)
         {
             CryptocurrencyName = cryptocurrencyName;
             Volume = volume;

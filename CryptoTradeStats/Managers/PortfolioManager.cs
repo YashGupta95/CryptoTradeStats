@@ -47,12 +47,12 @@ namespace CryptoTradeStats
                     {
                         if (excelWorksheet.Cells[row, 12].Value.ToString() == DepositTradeType || excelWorksheet.Cells[row, 12].Value.ToString() == ReinvestTradeType)
                         {
-                            var buyPriceInr = double.Parse(excelWorksheet.Cells[row, 7].Value.ToString());
+                            var buyPriceInr = decimal.Parse(excelWorksheet.Cells[row, 7].Value.ToString());
 
                             var buyRecords = new StatisticsBuy(
                                 dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
-                                coinPrice: double.Parse(excelWorksheet.Cells[row, 4].Value.ToString()),
-                                volume: double.Parse(excelWorksheet.Cells[row, 5].Value.ToString()),
+                                coinPrice: decimal.Parse(excelWorksheet.Cells[row, 4].Value.ToString()),
+                                volume: decimal.Parse(excelWorksheet.Cells[row, 5].Value.ToString()),
                                 totalBuyPriceInr: Math.Round(buyPriceInr, 2)
                                 );
 
@@ -60,12 +60,12 @@ namespace CryptoTradeStats
                         }
                         else
                         {
-                            var sellPriceInr = double.Parse(excelWorksheet.Cells[row, 11].Value.ToString());
+                            var sellPriceInr = decimal.Parse(excelWorksheet.Cells[row, 11].Value.ToString());
 
                             var sellRecords = new StatisticsSell(
                                 dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
-                                coinPrice: double.Parse(excelWorksheet.Cells[row, 8].Value.ToString()),
-                                volume: double.Parse(excelWorksheet.Cells[row, 9].Value.ToString()),
+                                coinPrice: decimal.Parse(excelWorksheet.Cells[row, 8].Value.ToString()),
+                                volume: decimal.Parse(excelWorksheet.Cells[row, 9].Value.ToString()),
                                 totalSellPriceInr: Math.Round(sellPriceInr, 2)
                                 );
 
@@ -79,7 +79,7 @@ namespace CryptoTradeStats
 
                 if (totalBuyVolume == totalSellVolume)
                 {
-                    currentInvestmentData = new CurrentInvestmentData(cryptocurrencyName, volume: 0, netInvestedAmount: 0.0);
+                    currentInvestmentData = new CurrentInvestmentData(cryptocurrencyName, volume: 0, netInvestedAmount: 0.0M);
                 }
                 else if (totalBuyVolume > totalSellVolume)
                 {
@@ -106,10 +106,10 @@ namespace CryptoTradeStats
             int totalBuyEntries = 0;
             int totalSellEntries = 0;
 
-            double depositBuyAmount = 0.0;
-            double reinvestedBuyAmount = 0.0;
-            double totalBuyAmount = 0.0;
-            double totalSellAmount = 0.0;
+            decimal depositBuyAmount = 0.0M;
+            decimal reinvestedBuyAmount = 0.0M;
+            decimal totalBuyAmount = 0.0M;
+            decimal totalSellAmount = 0.0M;
 
             var start = excelWorksheet.Dimension.Start;
             var end = excelWorksheet.Dimension.End;
@@ -123,18 +123,18 @@ namespace CryptoTradeStats
                     totalBuyEntries = excelWorksheet.Cells[r, 6].Value.ToString() != "0" ? (totalBuyEntries += 1) : (totalBuyEntries += 0);
                     if (excelWorksheet.Cells[r, 12].Value.ToString() == DepositTradeType)
                     {
-                        var actualDepositBuyAmount = double.Parse(excelWorksheet.Cells[r, 7].Value.ToString());
+                        var actualDepositBuyAmount = decimal.Parse(excelWorksheet.Cells[r, 7].Value.ToString());
                         depositBuyAmount += Math.Round(actualDepositBuyAmount, 2);
                     }
                     else
                     {
-                        var actualReinvestedBuyAmount = double.Parse(excelWorksheet.Cells[r, 7].Value.ToString());
+                        var actualReinvestedBuyAmount = decimal.Parse(excelWorksheet.Cells[r, 7].Value.ToString());
                         reinvestedBuyAmount += Math.Round(actualReinvestedBuyAmount, 2);
                     }
                     totalBuyAmount = depositBuyAmount + reinvestedBuyAmount;
 
                     totalSellEntries = excelWorksheet.Cells[r, 10].Value.ToString() != "0" ? (totalSellEntries += 1) : (totalSellEntries += 0);
-                    var actualSellAmount = double.Parse(excelWorksheet.Cells[r, 11].Value.ToString());
+                    var actualSellAmount = decimal.Parse(excelWorksheet.Cells[r, 11].Value.ToString());
                     totalSellAmount += Math.Round(actualSellAmount, 2);
                 }
 
@@ -160,11 +160,10 @@ namespace CryptoTradeStats
             Console.WriteLine($"TRADE STATISTICS FOR {stablecoinName} TRADING :");
             Console.WriteLine("##############################################################################################");
 
-            Console.WriteLine($"\n{stablecoinName}-based Cryptocurrencies present in Portfolio:\n");
-            foreach (var coin in portfolioSummary.CoinsList)
-            {
-                Console.WriteLine($"{coin}/{stablecoinName}");
-            }
+            Console.WriteLine($"\n{stablecoinName}-based Cryptocurrencies present in Portfolio:");
+            
+            var coinsListWithStablecoinSuffix = portfolioSummary.CoinsList.Select(c => c + $"/{stablecoinName}");
+            Console.WriteLine(string.Join(", ", coinsListWithStablecoinSuffix));
 
             Console.WriteLine($"\n- Total number of buy/sell entries found in Logbook for {stablecoinName} Trades: {portfolioSummary.LogbookEntries} \n");
             Console.WriteLine("##############################################################################################");

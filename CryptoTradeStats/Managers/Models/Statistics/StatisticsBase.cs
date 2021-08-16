@@ -5,10 +5,10 @@ namespace CryptoTradeStats
     public abstract class StatisticsBase
     {
         public DateTime DateOfTransaction { get; }
-        public double CoinPrice { get; }
-        public double Volume { get; }
+        public decimal CoinPrice { get; }
+        public decimal Volume { get; }
         
-        protected StatisticsBase(DateTime dateOfTransaction, double coinPrice, double volume)
+        protected StatisticsBase(DateTime dateOfTransaction, decimal coinPrice, decimal volume)
         {
             DateOfTransaction = dateOfTransaction;
             CoinPrice = coinPrice;

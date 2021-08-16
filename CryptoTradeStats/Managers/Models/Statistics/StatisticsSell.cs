@@ -4,9 +4,9 @@ namespace CryptoTradeStats
 {
     internal class StatisticsSell : StatisticsBase
     {
-        public double TotalSellPriceInr { get; }
+        public decimal TotalSellPriceInr { get; }
 
-        public StatisticsSell(DateTime dateOfTransaction, double coinPrice, double volume, double totalSellPriceInr) : base(dateOfTransaction, coinPrice, volume)
+        public StatisticsSell(DateTime dateOfTransaction, decimal coinPrice, decimal volume, decimal totalSellPriceInr) : base(dateOfTransaction, coinPrice, volume)
         {
             TotalSellPriceInr = totalSellPriceInr;
         }

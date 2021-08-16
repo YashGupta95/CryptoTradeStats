@@ -21,7 +21,7 @@ namespace CryptoTradeStats
             {
                 Console.WriteLine("**********************************************************************************************");
                 Console.WriteLine("\n1. Trading Portfolio Summary");
-                Console.WriteLine("2. Trading Details for a specific Cryptocurrency");
+                Console.WriteLine("2. Trading details for a specific Cryptocurrency");
                 Console.WriteLine("3. Exit\n");
                 Console.WriteLine("**********************************************************************************************");
 
