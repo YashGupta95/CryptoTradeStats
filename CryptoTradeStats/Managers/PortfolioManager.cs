@@ -157,7 +157,8 @@ namespace CryptoTradeStats
 
         private void DisplayPortfolioSummary(PortfolioSummary portfolioSummary, Stablecoin stablecoinName)
         {
-            Console.WriteLine($"TRADE STATISTICS FOR {stablecoinName} TRADING :");
+            var header = $"TRADE STATISTICS FOR {stablecoinName} TRADING";
+            Console.WriteLine(header.PadLeft(60));
             Console.WriteLine("##############################################################################################");
 
             Console.WriteLine($"\n{stablecoinName}-based Cryptocurrencies present in Portfolio:");
@@ -210,7 +211,7 @@ namespace CryptoTradeStats
 
         private void DisplayTradeRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, CurrentInvestmentData currentInvestmentData, string stablecoin)
         {
-            var format = "{0, -25} | {1, -20} | {2, -20} | {3, -25} \n";
+            var format = "{0, -20} | {1, -15} | {2, -10} | {3, -20} \n";
 
             var buyRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Volume", "Total Buy Price (INR)");
             var sellRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Volume", "Total Sell Price (INR)");
@@ -222,7 +223,7 @@ namespace CryptoTradeStats
             }
 
             Console.WriteLine("**********************************************************************************************");
-            Console.WriteLine("Buy Records:");
+            Console.WriteLine("BUY RECORDS:");
             Console.WriteLine("**********************************************************************************************");
             Console.WriteLine(buyRecordsOutput.ToString());
 
@@ -233,12 +234,12 @@ namespace CryptoTradeStats
             }
 
             Console.WriteLine("**********************************************************************************************");
-            Console.WriteLine("Sell Records:");
+            Console.WriteLine("SELL RECORDS:");
             Console.WriteLine("**********************************************************************************************");
             Console.WriteLine(sellRecordsOutput.ToString());
 
             Console.WriteLine("**********************************************************************************************");
-            Console.WriteLine($"Volume of {currentInvestmentData.CryptocurrencyName} coins in Portfolio: {currentInvestmentData.Volume}  \nCurrent Invested Amount (INR): {currentInvestmentData.NetInvestedAmount}\n");
+            Console.WriteLine($"Current volume of {currentInvestmentData.CryptocurrencyName} coins in Portfolio: {currentInvestmentData.Volume}  \nCurrent Invested Amount (INR): {currentInvestmentData.NetInvestedAmount}\n");
             Console.WriteLine("**********************************************************************************************");
         }
     }

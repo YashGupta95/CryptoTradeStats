@@ -15,10 +15,10 @@ namespace CryptoTradeStats
 
             var portfolioManager = new PortfolioManager();
             string userInput;
-            Console.WriteLine("******************************* Welcome to Crypto Trade Stats ********************************");
 
             do
             {
+                Console.WriteLine("******************************* Welcome to Crypto Trade Stats ********************************");
                 Console.WriteLine("**********************************************************************************************");
                 Console.WriteLine("\n1. Trading Portfolio Summary");
                 Console.WriteLine("2. Trading details for a specific Cryptocurrency");
@@ -31,10 +31,12 @@ namespace CryptoTradeStats
                 switch (userInput)
                 {
                     case "1":
+                        Console.Clear();
                         portfolioManager.FetchPortfolioSummary(spreadsheet);
                         break;
 
                     case "2":
+                        Console.Clear();
                         Console.WriteLine("\nEnter the name of Cryptocurrency (e.g. ETH for Ethereum): ");
                         var cryptocurrencyName = Console.ReadLine();
                         Console.WriteLine("\nEnter the name of Trading Stablecoin (e.g. USDT for Tether): ");
@@ -53,6 +55,7 @@ namespace CryptoTradeStats
 
                 Console.WriteLine("\nPress any key to return to main menu...");
                 Console.ReadLine();
+                Console.Clear();
             }
             while (userInput != "3");
 
