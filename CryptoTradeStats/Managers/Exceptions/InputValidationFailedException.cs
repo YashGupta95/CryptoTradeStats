@@ -12,6 +12,6 @@ namespace CryptoTradeStats
         public InputValidationFailedException() { }
         public InputValidationFailedException(string message) : base(message) { }
         public InputValidationFailedException(string message, Exception innerException) : base(message, innerException) { }
-        public InputValidationFailedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        private InputValidationFailedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

@@ -9,8 +9,9 @@ namespace CryptoTradeStats
 {
     internal class PortfolioManager
     {
-        private const string DepositTradeType = "Buy";
+        private const string BuyTradeType = "Buy";
         private const string ReinvestTradeType = "Reinvest";
+        private const string SellTradeType = "Sell";
 
         private CurrentInvestmentData currentInvestmentData;
 
@@ -31,7 +32,7 @@ namespace CryptoTradeStats
 
             var excelWorksheet = spreadsheet.Workbook.Worksheets[tradingStablecoin];
             EnsureCryptocurrencyIsPresentInPortfolio(excelWorksheet, cryptocurrencyName);
-            
+
             var dateTimeFormat = "dd-MM-yyyy HH:mm:ss";
 
             var buyRecordsData = new List<StatisticsBuy>();
@@ -45,7 +46,7 @@ namespace CryptoTradeStats
                 {
                     if (excelWorksheet.Cells[row, 2].Value.ToString() == cryptocurrencyName)
                     {
-                        if (excelWorksheet.Cells[row, 12].Value.ToString() == DepositTradeType || excelWorksheet.Cells[row, 12].Value.ToString() == ReinvestTradeType)
+                        if (excelWorksheet.Cells[row, 12].Value.ToString() == BuyTradeType || excelWorksheet.Cells[row, 12].Value.ToString() == ReinvestTradeType)
                         {
                             var buyPriceInr = decimal.Parse(excelWorksheet.Cells[row, 7].Value.ToString());
 
@@ -118,24 +119,34 @@ namespace CryptoTradeStats
 
             try
             {
-                for (int r = start.Row + 1; r <= end.Row; r++)
+                for (int row = start.Row + 1; row <= end.Row; row++)
                 {
-                    totalBuyEntries = excelWorksheet.Cells[r, 6].Value.ToString() != "0" ? (totalBuyEntries += 1) : (totalBuyEntries += 0);
-                    if (excelWorksheet.Cells[r, 12].Value.ToString() == DepositTradeType)
+                    switch (excelWorksheet.Cells[row, 12].Value.ToString())
                     {
-                        var actualDepositBuyAmount = decimal.Parse(excelWorksheet.Cells[r, 7].Value.ToString());
-                        depositBuyAmount += Math.Round(actualDepositBuyAmount, 2);
-                    }
-                    else
-                    {
-                        var actualReinvestedBuyAmount = decimal.Parse(excelWorksheet.Cells[r, 7].Value.ToString());
-                        reinvestedBuyAmount += Math.Round(actualReinvestedBuyAmount, 2);
-                    }
-                    totalBuyAmount = depositBuyAmount + reinvestedBuyAmount;
+                        case BuyTradeType:
+                            totalBuyEntries += 1;
+                            var actualDepositBuyAmount = decimal.Parse(excelWorksheet.Cells[row, 7].Value.ToString());
+                            depositBuyAmount += Math.Round(actualDepositBuyAmount, 2);
+                            break;
 
-                    totalSellEntries = excelWorksheet.Cells[r, 10].Value.ToString() != "0" ? (totalSellEntries += 1) : (totalSellEntries += 0);
-                    var actualSellAmount = decimal.Parse(excelWorksheet.Cells[r, 11].Value.ToString());
-                    totalSellAmount += Math.Round(actualSellAmount, 2);
+                        case ReinvestTradeType:
+                            totalBuyEntries += 1;
+                            var actualReinvestedBuyAmount = decimal.Parse(excelWorksheet.Cells[row, 7].Value.ToString());
+                            reinvestedBuyAmount += Math.Round(actualReinvestedBuyAmount, 2);
+                            break;
+
+                        case SellTradeType:
+                            totalSellEntries += 1;
+                            var actualSellAmount = decimal.Parse(excelWorksheet.Cells[row, 11].Value.ToString());
+                            totalSellAmount += Math.Round(actualSellAmount, 2);
+                            break;
+
+                        default:
+                            Console.WriteLine("Error: The Trade Type is not supported.");
+                            break;
+                    }
+
+                    totalBuyAmount = depositBuyAmount + reinvestedBuyAmount;
                 }
 
                 return new PortfolioSummary(
@@ -162,7 +173,7 @@ namespace CryptoTradeStats
             Console.WriteLine("##############################################################################################");
 
             Console.WriteLine($"\n{stablecoinName}-based Cryptocurrencies present in Portfolio:");
-            
+
             var coinsListWithStablecoinSuffix = portfolioSummary.CoinsList.Select(c => c + $"/{stablecoinName}");
             Console.WriteLine(string.Join(", ", coinsListWithStablecoinSuffix));
 

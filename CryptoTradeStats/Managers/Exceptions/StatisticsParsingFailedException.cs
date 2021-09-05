@@ -12,6 +12,6 @@ namespace CryptoTradeStats
         public StatisticsParsingFailedException() { }
         public StatisticsParsingFailedException(string message) : base(message) { }
         public StatisticsParsingFailedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-        public StatisticsParsingFailedException(string message, Exception innerException) : base(message, innerException) { }
+        private StatisticsParsingFailedException(string message, Exception innerException) : base(message, innerException) { }
     }
 }

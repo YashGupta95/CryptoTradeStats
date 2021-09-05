@@ -12,6 +12,6 @@ namespace CryptoTradeStats
         public CryptocurrencyNotFoundException() { }
         public CryptocurrencyNotFoundException(string message) : base(message) { }
         public CryptocurrencyNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-        public CryptocurrencyNotFoundException(string message, Exception innerException) : base(message, innerException) { }
+        private CryptocurrencyNotFoundException(string message, Exception innerException) : base(message, innerException) { }
     }
 }
