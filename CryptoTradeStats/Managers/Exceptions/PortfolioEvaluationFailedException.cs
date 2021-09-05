@@ -12,6 +12,6 @@ namespace CryptoTradeStats
         public PortfolioEvaluationFailedException() { }
         public PortfolioEvaluationFailedException(string message) : base(message) { }
         public PortfolioEvaluationFailedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-        public PortfolioEvaluationFailedException(string message, Exception innerException) : base(message, innerException) { }
+        private PortfolioEvaluationFailedException(string message, Exception innerException) : base(message, innerException) { }
     }
 }
