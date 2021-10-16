@@ -33,8 +33,6 @@ namespace CryptoTradeStats
             var excelWorksheet = spreadsheet.Workbook.Worksheets[tradingStablecoin];
             EnsureCryptocurrencyIsPresentInPortfolio(excelWorksheet, cryptocurrencyName);
 
-            var dateTimeFormat = "dd-MM-yyyy HH:mm:ss";
-
             var buyRecordsData = new List<StatisticsBuy>();
             var sellRecordsData = new List<StatisticsSell>();
 
@@ -46,14 +44,18 @@ namespace CryptoTradeStats
                 {
                     if (excelWorksheet.Cells[row, 2].Value.ToString() == cryptocurrencyName)
                     {
+                        var dateOfTransaction = double.Parse(excelWorksheet.Cells[row, 1].Value.ToString());
+
                         if (excelWorksheet.Cells[row, 12].Value.ToString() == BuyTradeType || excelWorksheet.Cells[row, 12].Value.ToString() == ReinvestTradeType)
                         {
+                            var coinPrice = excelWorksheet.Cells[row, 4].Value.ToString();
+                            var volume = excelWorksheet.Cells[row, 5].Value.ToString();
                             var buyPriceInr = decimal.Parse(excelWorksheet.Cells[row, 7].Value.ToString());
 
                             var buyRecords = new StatisticsBuy(
-                                dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
-                                coinPrice: decimal.Parse(excelWorksheet.Cells[row, 4].Value.ToString()),
-                                volume: decimal.Parse(excelWorksheet.Cells[row, 5].Value.ToString()),
+                                dateOfTransaction: DateTime.FromOADate(dateOfTransaction),
+                                coinPrice: decimal.Parse(coinPrice, NumberStyles.Float),
+                                volume: decimal.Parse(volume, NumberStyles.Float),
                                 totalBuyPriceInr: Math.Round(buyPriceInr, 2)
                                 );
 
@@ -61,12 +63,14 @@ namespace CryptoTradeStats
                         }
                         else
                         {
+                            var coinPrice = excelWorksheet.Cells[row, 8].Value.ToString();
+                            var volume = excelWorksheet.Cells[row, 9].Value.ToString();
                             var sellPriceInr = decimal.Parse(excelWorksheet.Cells[row, 11].Value.ToString());
 
                             var sellRecords = new StatisticsSell(
-                                dateOfTransaction: DateTime.ParseExact(excelWorksheet.Cells[row, 1].Value.ToString(), dateTimeFormat, CultureInfo.InvariantCulture),
-                                coinPrice: decimal.Parse(excelWorksheet.Cells[row, 8].Value.ToString()),
-                                volume: decimal.Parse(excelWorksheet.Cells[row, 9].Value.ToString()),
+                                dateOfTransaction: DateTime.FromOADate(dateOfTransaction),
+                                coinPrice: decimal.Parse(coinPrice, NumberStyles.Float),
+                                volume: decimal.Parse(volume, NumberStyles.Float),
                                 totalSellPriceInr: Math.Round(sellPriceInr, 2)
                                 );
 
@@ -222,7 +226,7 @@ namespace CryptoTradeStats
 
         private void DisplayTradeRecords(List<StatisticsBuy> buyRecordsData, List<StatisticsSell> sellRecordsData, CurrentInvestmentData currentInvestmentData, string stablecoin)
         {
-            var format = "{0, -20} | {1, -15} | {2, -10} | {3, -20} \n";
+            var format = "{0, -25} | {1, -15} | {2, -10} | {3, -20} \n";
 
             var buyRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Volume", "Total Buy Price (INR)");
             var sellRecordsOutput = new StringBuilder().AppendFormat(format, "Transaction Date", "Coin Price", "Volume", "Total Sell Price (INR)");
