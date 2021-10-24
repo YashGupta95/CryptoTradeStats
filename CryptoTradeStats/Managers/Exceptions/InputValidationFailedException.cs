@@ -9,9 +9,24 @@ namespace CryptoTradeStats
     internal sealed class InputValidationFailedException : Exception
     {
         public string Reason => "Inputs validation failed.";
-        public InputValidationFailedException() { }
-        public InputValidationFailedException(string message) : base(message) { }
-        public InputValidationFailedException(string message, Exception innerException) : base(message, innerException) { }
-        private InputValidationFailedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+
+        public InputValidationFailedException() 
+        { 
+        }
+
+        public InputValidationFailedException(string message) 
+            : base(message) 
+        { 
+        }
+
+        public InputValidationFailedException(string message, Exception innerException) 
+            : base(message, innerException) 
+        { 
+        }
+
+        private InputValidationFailedException(SerializationInfo info, StreamingContext context) 
+            : base(info, context) 
+        { 
+        }
     }
 }

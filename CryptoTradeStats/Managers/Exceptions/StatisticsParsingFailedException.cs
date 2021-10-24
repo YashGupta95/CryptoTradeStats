@@ -9,9 +9,24 @@ namespace CryptoTradeStats
     internal sealed class StatisticsParsingFailedException : Exception
     {
         public string Reason => "Unable to parse Buy/Sell Statistics details.";
-        public StatisticsParsingFailedException() { }
-        public StatisticsParsingFailedException(string message) : base(message) { }
-        public StatisticsParsingFailedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
-        private StatisticsParsingFailedException(string message, Exception innerException) : base(message, innerException) { }
+
+        public StatisticsParsingFailedException() 
+        { 
+        }
+
+        public StatisticsParsingFailedException(string message) 
+            : base(message) 
+        { 
+        }
+
+        public StatisticsParsingFailedException(string message, Exception innerException) 
+            : base(message, innerException) 
+        { 
+        }
+
+        private StatisticsParsingFailedException(SerializationInfo info, StreamingContext context) 
+            : base(info, context) 
+        { 
+        }
     }
 }
